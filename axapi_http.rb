@@ -15,16 +15,16 @@
 require 'net/http'
 
 class HttpClient
-    def initialize(host, port=nil, timeout=nil,
+    @@HEADERS = {
+        "Content-type" => "application/json",
+        "User-Agent" => "a10-chef"
+    }
+
+    def initialize(host, protocol="https", port=nil, timeout=nil,
                    retry_errno_list=nil)
         @host = host
         @timeout = timeout
-        @port = port
-        @rety_errno_list = retry_errno_list
-    end
-
-    def create(protocol=nil)
-        if @port == nil
+        if port == nil
             if protocol == "https"
                 @port = 443
             else
@@ -33,8 +33,14 @@ class HttpClient
         end
         @url_base = "#{protocol}://#{@host}:#{@port}"
         print "\n#{@url_base}\n"
+        @rety_errno_list = retry_errno_list
     end
+
+    def request(method, api_url, params={}, headers=nil, filename=nil,
+                file_content=nil, axapi_args=nil, **kwargs)
+        if axapi_args != nil
+            formatted_axapi_args = (axapi_args.map.each {|pair| pair.map{|x| x.gsub("-", "_")}}).to_h
+        end
 end
 
 client = HttpClient.new("1.1.1.1")
-client.create("https")
