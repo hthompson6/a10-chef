@@ -13,6 +13,7 @@
 #    under the License.
 
 require 'net/http'
+require 'json'
 
 class HttpClient
     @@HEADERS = {
@@ -40,7 +41,31 @@ class HttpClient
                 file_content=nil, axapi_args=nil, **kwargs)
         if axapi_args != nil
             formatted_axapi_args = (axapi_args.map.each {|pair| pair.map{|x| x.gsub("-", "_")}}).to_h
+            params.merge!(formatted_axapi_args)
         end
+
+        if filename == nil || file_content == nil
+            raise 'file_name and file_content must both be populated if one is'
+        end
+
+        hdrs = @@HEADERS.dup
+        if headers != nil
+            hdrs.merge!(headers)
+        end
+
+        if params
+            params_copy = params.dup
+
+            # Ruby assumes utf-8
+            payload = json.dumps(params_copy)
+        else
+            payload = nil
+        end
+
+        if filename != nil
+            files = {}
+        end
+    end
 end
 
 client = HttpClient.new("1.1.1.1")
