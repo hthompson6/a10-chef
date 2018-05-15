@@ -16,7 +16,7 @@ require 'net/http'
 require 'json'
 
 class HttpClient
-    @@HEADERS = {
+    :HEADERS = {
         "Content-type" => "application/json",
         "User-Agent" => "a10-chef"
     }
