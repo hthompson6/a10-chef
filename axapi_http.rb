@@ -122,8 +122,25 @@ class HttpClient
 
        return r
     end
+end
 
-    def authenticate(username, password):
+class Session
+
+    @@http = nil
+
+    def initialize(http, username, password)
+        @@http = http
+        @username = username
+        @password = password
+        @session_id = None
+    end
+
+    def get_auth_header
+        auth = authenticate(@username, @password)
+        return {"Authorization" =>  "A10 #{auth}"}
+    end
+
+    def authenticate(username, password)
         url = "/axapi/v3/auth"
         payload = {
             "credentials" => {
@@ -135,8 +152,8 @@ class HttpClient
         if @session_id != nil:
             close()
         end
-        response = Unirest.post "https://10.48.6.222:443/axapi/v3/auth", parameters: payload.to_json
 
+        response = @@http.post(url, parameters: payload.to_json)
         if response.body['authresponse']['signature']
             @session_id = response.body['authresponse']['signature']
         else
@@ -145,6 +162,63 @@ class HttpClient
 
         return response
     end
+
+    def close
+        if @session_id == nil
+            return nil
+        end
+
+       begin
+           h = {"Authorization" => "A10 #{@session_id}" }
+           r = Unirest.post "/axapi/v3/logoff", headers=h
+       ensure
+           @session_id = nil
+       end
+    end
 end
 
-client = HttpClient.new("1.1.1.1")
+class A10Client
+    def initialize(session)
+        @session = session
+    end
+
+    def _request(method, url, params, **kwargs)
+        begin
+            return @session.http.request(method, url, params
+                                         @session.get_auth_header(),
+                                         **kwargs)
+        rescue
+          raise "Replace with Invalid Session ID"
+        end
+    end
+
+    def get(url, params={}, **kwargs)
+        return _request("GET", url, params, **kwargs)
+    end
+
+    def post(url, params={}, **kwargs)
+        return _request("POST", url, params, **kwargs)
+    end
+
+    def put(url, params={}, **kwargs)
+        return _request("PUT", url, params, **kwargs)
+    end
+
+    def delete(url, params={}, **kwargs)
+        return _request("DELETE", url, params, **kwargs)
+    end
+end
+
+def http_factory(host, port, protocol)
+    return HttpClient(host, port, protocol)
+end
+
+def session_factory(http, username, password)
+    return Session(http, username, password)
+end
+
+def client_factory(host, port, protocol, username, password)
+    http_cli = http_factory(host, port, protocol)
+    session = session_factory(http_cli, username, password)
+    return A10Client(session)
+end
