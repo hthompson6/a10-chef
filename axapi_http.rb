@@ -39,6 +39,7 @@ class HttpClient
 
     def request(method, api_url, params={}, headers=nil, filename=nil,
                 file_content=nil, axapi_args=nil, **kwargs)
+
         if axapi_args != nil
             formatted_axapi_args = (axapi_args.map.each {|pair| pair.map{|x| x.gsub("-", "_")}}).to_h
             params.merge!(formatted_axapi_args)
@@ -53,6 +54,8 @@ class HttpClient
             hdrs.merge!(headers)
         end
 
+        # @@Headers.map{|k, v| {Unirest.default_header(k, v)}}
+
         if params
             params_copy = params.dup
 
@@ -63,8 +66,84 @@ class HttpClient
         end
 
         if filename != nil
-            files = {}
+            files = {
+                "file" => ,
+                "json" => , 
+            }
+            hdrs.delete("Content-type")
+            hdrs.delete("Content-Type")
         end
+    
+        begin
+            last_e = nil
+            if filename != nil
+                z = nil
+            else
+                case method
+                when "GET"
+                    Unirest.get @url_base + api_url, headers: hdrs,
+                                parameters: params.merge!(kwargs)
+                when "POST"
+                    Unirest.post @url_base + api_url, headers: hdrs,
+                                 parameters: params.merge!(kwargs)
+                when "PUT"
+                    z = Unirest.put @url_base + api_url, headers: hdrs,
+                                parameters: params.merge!(kwargs)
+                when "DELETE"
+                    z = Unirest.delete @url_base + api_url, headers: hdrs,
+                                   parameters: params.merge!(kwargs)
+                end
+            end
+        rescue SocketError => e
+            raise e
+        end
+
+       if z.code == 204
+           return nil
+       end
+
+       begin
+           r = JSON.parse(z)
+       rescue ParseError => e
+           if z.code == 200:
+               return {}
+           else
+               raise e
+           end
+       end
+
+       if r['response']['status'] == 'faill'
+           raise "acos exception"
+       end
+
+       if r['authorizationschema']
+           raise "acos exceptions"
+       end
+
+       return r
+    end
+
+    def authenticate(username, password):
+        url = "/axapi/v3/auth"
+        payload = {
+            "credentials" => {
+                "username" => username,
+                "password" => password
+            }
+        }
+
+        if @session_id != nil:
+            close()
+        end
+        response = Unirest.post "https://10.48.6.222:443/axapi/v3/auth", parameters: payload.to_json
+
+        if response.body['authresponse']['signature']
+            @session_id = response.body['authresponse']['signature']
+        else
+            @session_id = nil
+        end
+
+        return response
     end
 end
 
