@@ -31,56 +31,57 @@ class AcosException < StandarError
     end
 end
 
-
-class ACOSUnsupportedVersion < ACOSException; end
-
-
-class ACOSUnknownError < ACOSException; end
+module AE
+    class ACOSUnsupportedVersion < ACOSException; end
 
 
-class AddressSpecifiedIsInUse < ACOSException; end
+    class ACOSUnknownError < ACOSException; end
 
 
-class AuthenticationFailure < ACOSException; end
+    class AddressSpecifiedIsInUse < ACOSException; end
 
 
-class InvalidSessionID < ACOSException; end
+    class AuthenticationFailure < ACOSException; end
 
 
-class Exists < ACOSException; end
+    class InvalidSessionID < ACOSException; end
 
 
-class NotFound < ACOSException; end
+    class Exists < ACOSException; end
 
 
-class NoSuchServiceGroup < ACOSException; end
+    class NotFound < ACOSException; end
 
 
-class NotImplemented < ACOSException; end
+    class NoSuchServiceGroup < ACOSException; end
 
 
-class InUse < ACOSException; end 
+    class NotImplemented < ACOSException; end
 
 
-class InvalidPartitionParameter < ACOSException; end
+    class InUse < ACOSException; end 
 
 
-class MemoryFault < ACOSException; end
+    class InvalidPartitionParameter < ACOSException; end
 
 
-class InvalidParameter < ACOSException; end
+    class MemoryFault < ACOSException; end
 
 
-class OutOfPartitions < ACOSException; end
+    class InvalidParameter < ACOSException; end
 
 
-class PartitionIdExists < ACOSException; end
+    class OutOfPartitions < ACOSException; end
 
 
-class HMMissingHttpPassive < ACOSException; end
+    class PartitionIdExists < ACOSException; end
 
 
-class AxapiJsonFormatError < ACOSException; end
+    class HMMissingHttpPassive < ACOSException; end
 
 
-class ConfigManagerNotReady < ACOSException; end
+    class AxapiJsonFormatError < ACOSException; end
+
+
+    class ConfigManagerNotReady < ACOSException; end
+end
