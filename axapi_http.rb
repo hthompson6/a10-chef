@@ -12,14 +12,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-require 'json'
 require 'unirest'
 
 require_relative 'errors'
 require_relative 'responses'
 
 module A10Client
-
 
     class HttpClient
         @@HEADERS = {
@@ -137,7 +135,7 @@ module A10Client
             @@http = http
             @username = username
             @password = password
-            @session_id = None
+            @session_id = nil
         end
     
         def get_auth_header
@@ -168,7 +166,7 @@ module A10Client
             return response
         end
     
-        def close
+        def close()
             if @session_id == nil
                 return nil
             end
@@ -177,6 +175,8 @@ module A10Client
                h = {"Authorization" => "A10 #{@session_id}" }
                r = Unirest.post "/axapi/v3/logoff", headers=h
            ensure
+               @session_id = nil
+           end
         end
     end
     
@@ -188,7 +188,7 @@ module A10Client
     
         def _request(method, url, params, **kwargs)
             begin
-                return @session.http.request(method, url, params
+                return @session.http.request(method, url, params,
                                              @session.get_auth_header(),
                                              **kwargs)
             rescue
@@ -224,6 +224,6 @@ module A10Client
     def self.client_factory(host, port, protocol, username, password)
         http_cli = http_factory(host, port, protocol)
         session = session_factory(http_cli, username, password)
-        return A10Client.new(session)
+        return ACOSClient.new(session)
     end
 end

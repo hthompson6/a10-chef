@@ -4,7 +4,7 @@
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
 #
-#         http://www.apache.org/licenses/LICENSE-2.0
+#         http=>//www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
 #    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -18,175 +18,175 @@ require_relative 'errors'
 module ErrorResp
 
     @@RESPONSE_CODES = {
-        33619969: {
-            '*': {
-                '*': AE::InUse
+        33619969 => {
+            '*' => {
+                '*' => AE::InUse
             }
         },
-        67371011: {
-            '*': {
-                '*': AE::Exists
+        67371011=> {
+            '*' => {
+                '*' => AE::Exists
              }
         },
-        419495936: {
-            '*': {
-                '/axapi/v3/logoff': nil,
-                '*': AE::InvalidSessionID
+        419495936 => {
+            '*' => {
+                '/axapi/v3/logoff' => nil,
+                '*' => AE::InvalidSessionID
             }
         },
-        520749062: {
-            '*': {
-                '*': AE::NotFound
+        520749062 => {
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        654311495: {
-            '*': {
-                '*': AE::Exists
+        654311495 => {
+            '*' => {
+                '*' => AE::Exists
             }
         },
-        67240011: {
-            '*': {
-                '*': AE::Exists
+        67240011 => {
+            '*' => {
+                '*' => AE::Exists
             }
         },
-        754974732: {
-            '*': {
-                '*': AE::Exists
+        754974732 => {
+            '*' => {
+                '*' => AE::Exists
             }
         },
-        754974733: {
-            '*': {
-                '*': AE::PartitionIdExists
+        754974733 => {
+            '*' => {
+                '*' => AE::PartitionIdExists
             }
         },
-        1023410176: {
-            'DELETE': {
-                '*': nil
+        1023410176 => {
+            'DELETE' => {
+                '*' => nil
             },
-            '*': {
-                '*': AE::NotFound
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1023410181: {
-            'DELETE': {
-                '*': nil
+        1023410181 => {
+            'DELETE' => {
+                '*' => nil
             },
-            '*': {
-                '/axapi/v3/slb/service-group/.*/member/': AE::NotFound,
-                '*': AE::NotFound
+            '*' => {
+                '/axapi/v3/slb/service-group/.*/member/' => AE::NotFound,
+                '*' => AE::NotFound
             }
         },
-        1023410183: {
-            '*': {
-                '*': AE::Exists
+        1023410183 => {
+            '*' => {
+                '*' => AE::Exists
             }
         },
-        1023451145: {
-            '*': {
-                '*': AE::Exists
+        1023451145 => {
+            '*' => {
+                '*' => AE::Exists
             }
         },
-        1023459339: {
-            '*': {
-                '/axapi/v3/slb/server': AE::Exists
+        1023459339 => {
+            '*' => {
+                '/axapi/v3/slb/server' => AE::Exists
             }
         },
-        1023459393: {
-            '*': {
-                '*': AE::InvalidParameter
+        1023459393 => {
+            '*' => {
+                '*' => AE::InvalidParameter
             }
         },
-        1023459335: {
-            '*': {
-                '*': AE::Exists
+        1023459335 => {
+            '*' => {
+                '*' => AE::Exists
             }
         },
-        1023460352: {
-            'DELETE': {
-                '*': None
+        1023460352 => {
+            'DELETE' => {
+                '*' => nil
             },
-            '*': {
-                '*': AE::NotFound
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1023463424: {
-            '*': {
-                '*': AE::ConfigManagerNotReady
+        1023463424 => {
+            '*' => {
+                '*' => AE::ConfigManagerNotReady
             }
         },
-        1023475722: {
-            '*': {
-                '*': AE::NotFound
+        1023475722 => {
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1023508480: {
-            '*': {
-                '*': AE::AxapiJsonFormatError
+        1023508480 => {
+            '*' => {
+                '*' => AE::AxapiJsonFormatError
             }
         },
-        1023509504: {
-            '*': {
-                '*': AE::NotFound
+        1023509504 => {
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1023524874: {
-            '*': {
-                '*': AE::AxapiJsonFormatError
+        1023524874 => {
+            '*' => {
+                '*' => AE::AxapiJsonFormatError
             }
         },
-        1023656960: {
-            '*': {
-                '*': AE::NotFound
+        1023656960 => {
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1023656962: {
-            '*': {
-                '*': AE::NotFound
+        1023656962 => {
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1207960052: {
-            '*': {
-                '/axapi/v3/logoff': None,
-                '*': AE::InvalidSessionID
+        1207960052 => {
+            '*' => {
+                '/axapi/v3/logoff' => nil,
+                '*' => AE::InvalidSessionID
             }
         },
-        1207959957: {
-            '*': {
-                '*': AE::NotFound
+        1207959957 => {
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1208025092: {
-            '*': {
-                '/axapi/v3/logoff': None,
-                '*': AE::InvalidSessionID
+        1208025092 => {
+            '*' => {
+                '/axapi/v3/logoff' => nil,
+                '*' => AE::InvalidSessionID
             }
         },
-        1208025095: {
-            '*': {
-                '*': AE::ConfigManagerNotReady
+        1208025095 => {
+            '*' => {
+                '*' => AE::ConfigManagerNotReady
             }
         },
-        1023443968: {
-            'DELETE': {
-                '*': None
+        1023443968 => {
+            'DELETE' => {
+                '*' => nil
             },
-            '*': {
-                '*': AE::NotFound
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        1023451144: {
-            '*': {
-                '*': AE::Exists
+        1023451144 => {
+            '*' => {
+                '*' => AE::Exists
             }
         },
-        1023475727: {
-            '*': {
-                '*': AE::NotFound
+        1023475727 => {
+            '*' => {
+                '*' => AE::NotFound
             }
         },
-        4294967295: {
-            '*': {
-                '*': AE::ConfigManagerNotReady
+        4294967295 => {
+            '*' => {
+                '*' => AE::ConfigManagerNotReady
             }
         },
     }
@@ -196,7 +196,7 @@ module ErrorResp
             code = response['authorizationschema']['code']
             s = response['authorzationschema']['error']
             if code == 401
-                if headers and 'Authorization' in headers
+                if headers and headers['Authorization']
                     raise AE::InvalideSessionID.new(code, s)
                 else
                     raise AE::AuthenticationFailure.new(code, s)
@@ -240,7 +240,6 @@ module ErrorResp
 
             raise ACOSException.new(code, response['response']['err']['msg'])
         end
+        raise ACOSException.new()
     end
- 
-    raise ACOSException.new()
 end

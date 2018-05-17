@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-class AcosException < StandarError
+class ACOSException < StandardError
     attr_reader :code
     attr_reader :msg
 
