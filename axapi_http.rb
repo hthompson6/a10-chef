@@ -31,13 +31,14 @@ module A10Client
             @timeout = timeout
             if port == nil
                 if protocol == "https"
-                    @port = 443
+                    p = 443
                 else
-                    @port = 80
+                    p  = 80
                 end
+            else
+                p = port
             end
-            @url_base = "#{protocol}://#{@host}:#{@port}"
-            print "\n#{@url_base}\n"
+            @url_base = "#{protocol}://#{@host}:#{p}"
             @rety_errno_list = retry_errno_list
         end
     
