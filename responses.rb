@@ -14,6 +14,7 @@
 
 require_relative 'errors'
 
+
 module ErrorResp
 
     @@RESPONSE_CODES = {
@@ -29,7 +30,7 @@ module ErrorResp
         },
         419495936: {
             '*': {
-                '/axapi/v3/logoff': None,
+                '/axapi/v3/logoff': nil,
                 '*': AE::InvalidSessionID
             }
         },
@@ -60,7 +61,7 @@ module ErrorResp
         },
         1023410176: {
             'DELETE': {
-                '*': None
+                '*': nil
             },
             '*': {
                 '*': AE::NotFound
@@ -68,7 +69,7 @@ module ErrorResp
         },
         1023410181: {
             'DELETE': {
-                '*': None
+                '*': nil
             },
             '*': {
                 '/axapi/v3/slb/service-group/.*/member/': AE::NotFound,
@@ -196,20 +197,20 @@ module ErrorResp
             s = response['authorzationschema']['error']
             if code == 401
                 if headers and 'Authorization' in headers
-                    raise AE::InvalideSessionID(code, s)
+                    raise AE::InvalideSessionID.new(code, s)
                 else
-                    raise AE::AuthenticationFailure(code, s)
+                    raise AE::AuthenticationFailure.new(code, s)
                 end
             elsif code == 403
-                raise AE::Authenticationfailure(code, s)
+                raise AE::Authenticationfailure.new(code, s)
             end
         end
     end
 
     def self.raise_axapi_ex(response, method, api_url)
         if response['response']['err']['code']
-            if RESPONSE_CODES[code]
-                ex_dict = RESPONSE_CODES[code]
+            if @@RESPONSE_CODES[code]
+                ex_dict = @@RESPONSE_CODES[code]
                 ex = nil
 
                 if ex_dict[method]
@@ -218,11 +219,28 @@ module ErrorResp
                     x = ex_dict['*']
                 end
 
-                matched = False
+                matched = false
                 x.each do |k, v|
-                    if k != '*' && 
+                    if k != '*' && api_url =~ /^#{k}/
+                        matched = true
+                        ex = x['*']
+                    end
+                end
+
+                if !matched && !ex && x['*'] != nil
+                    ex = x['*']
+                end
+
+                if ex
+                    raise ex.new(code, resposne['response']['err']['msg'])
+                else
+                    return
                 end
             end
+
+            raise ACOSException.new(code, response['response']['err']['msg'])
         end
     end
+ 
+    raise ACOSException.new()
 end
