@@ -12,7 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-require 'pry'
 require 'unirest'
 
 require_relative 'errors'
