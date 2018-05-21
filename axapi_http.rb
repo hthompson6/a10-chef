@@ -199,6 +199,8 @@ module A10Client
             return @session.http.request(method, url, params: params,
                                          headers: @session.get_auth_header(),
                                          **kwargs)
+        rescue AE::InvalidSessionID => e:
+            raise e
         end
     
         def get(url, params: {}, **kwargs)
