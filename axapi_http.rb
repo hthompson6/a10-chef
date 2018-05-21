@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+require 'pry'
 require 'unirest'
 
 require_relative 'errors'
@@ -21,7 +22,7 @@ module A10Client
 
     class HttpClient
         @@HEADERS = {
-            "Content-type" => "application/json",
+            "Content-Type"  => "application/json",
             "User-Agent" => "a10-chef"
         }
     
@@ -42,28 +43,27 @@ module A10Client
             @rety_errno_list = retry_errno_list
         end
     
-        def request(method, api_url, params={}, headers=nil, filename=nil,
-                    file_content=nil, axapi_args=nil, **kwargs)
+        def request(method, api_url, params: {}, headers: nil, filename: nil,
+                    file_content: nil, axapi_args: nil, **kwargs)
     
             if axapi_args != nil
                 formatted_axapi_args = (axapi_args.map.each {|pair| pair.map{|x| x.gsub("-", "_")}}).to_h
                 params.merge!(formatted_axapi_args)
             end
     
-            if filename == nil || file_content == nil
+            if (filename != nil || file_content != nil) && !(filename != nil && file_content != nil)
                 raise 'file_name and file_content must both be populated if one is'
             end
     
-            hdrs = :HEADERS.dup
+            hdrs = @@HEADERS.dup
             if headers != nil
                 hdrs.merge!(headers)
             end
-    
+   
             if params
                 params_copy = params.dup
-    
-                # Ruby assumes utf-8
-                payload = json.dumps(params_copy)
+                params_copy.merge!(kwargs)
+                payload=params_copy
             else
                 payload = nil
             end
@@ -84,17 +84,17 @@ module A10Client
                 else
                     case method
                     when "GET"
-                        Unirest.get @url_base + api_url, headers: hdrs,
-                                    parameters: params.merge!(kwargs)
+                        z = Unirest.get @url_base + api_url, headers:hdrs,
+                                        parameters:payload.to_json
                     when "POST"
-                        Unirest.post @url_base + api_url, headers: hdrs,
-                                     parameters: params.merge!(kwargs)
+                        z = Unirest.post @url_base + api_url, headers:hdrs,
+                                         parameters:payload.to_json 
                     when "PUT"
-                        z = Unirest.put @url_base + api_url, headers: hdrs,
-                                        parameters: params.merge!(kwargs)
+                        z = Unirest.put @url_base + api_url, headers:hdrs,
+                                        parameters:payload.to_json
                     when "DELETE"
-                        z = Unirest.delete @url_base + api_url, headers: hdrs,
-                                           parameters: params.merge!(kwargs)
+                        z = Unirest.delete @url_base + api_url, headers:hdrs,
+                                           parameters:payload.to_json
                     end
                 end
             rescue SocketError => e
@@ -104,18 +104,13 @@ module A10Client
            if z.code == 204
                return nil
            end
-    
-           begin
-               r = JSON.parse(z)
-           rescue ParseError => e
-               if z.code == 200
-                   return {}
-               else
-                   raise e
-               end
+
+           r = z.body 
+           if z.code == 200
+               return {}
            end
     
-           if r['response']['status'] == 'faill'
+           if r['response'] && r['response']['status'] == 'fail'
                raise "acos exception"
            end
     
@@ -125,53 +120,42 @@ module A10Client
     
            return r
         end
+
+        def get(url, params: {}, **kwargs)
+            return request("GET", url, params: params, **kwargs)
+        end
+
+        def post(url, params: {}, **kwargs)
+            return request("POST", url, params: params, **kwargs)
+        end
+
+        def put(url, params: {}, **kwargs)
+            return request("PUT", url, params: params, **kwargs)
+        end
+
+        def delete(url, params: {}, **kwargs)
+            return request("DELETE", url, params: params, **kwargs)
+        end
+
     end
     
 
     class Session
     
-        @@http = nil
+        attr_reader :http
     
         def initialize(http, username, password)
-            @@http = http
+            @http = http
             @username = username
             @password = password
             @session_id = nil
         end
-    
-        def get_auth_header
-            auth = authenticate(@username, @password)
-            return {"Authorization" =>  "A10 #{auth}"}
-        end
-    
-        def authenticate(username, password)
-            url = "/axapi/v3/auth"
-            payload = {
-                "credentials" => {
-                    "username" => username,
-                    "password" => password
-                }
-            }
-    
-            if @session_id != nil
-                close()
-            end
-    
-            response = @@http.post(url, parameters: payload.to_json)
-            if response.body['authresponse']['signature']
-                @session_id = response.body['authresponse']['signature']
-            else
-                @session_id = nil
-            end
-    
-            return response
-        end
-    
+
         def close()
             if @session_id == nil
                 return nil
             end
-    
+
            begin
                h = {"Authorization" => "A10 #{@session_id}" }
                r = Unirest.post "/axapi/v3/logoff", headers=h
@@ -179,8 +163,36 @@ module A10Client
                @session_id = nil
            end
         end
-    end
+
+        def authenticate(username, password)
+            url = "/axapi/v3/auth"
+            payload = {
+                :credentials => {
+                    :username => username,
+                    :password => password
+                }
+            }
     
+            if @session_id != nil
+                close()
+            end
+  
+            binding.pry 
+            response = @http.post(url, params: payload)
+            if response['authresponse'] && response['authresponse']['signature']
+                @session_id = response['authresponse']['signature']
+            else
+                @session_id = nil
+            end
+    
+            return response
+        end
+    
+        def get_auth_header
+            auth = authenticate(@username, @password)
+            return {"Authorization" =>  "A10 #{auth}"}
+        end
+    end
 
     class ACOSClient
         def initialize(session)
@@ -188,29 +200,25 @@ module A10Client
         end
     
         def _request(method, url, params, **kwargs)
-            begin
-                return @session.http.request(method, url, params,
-                                             @session.get_auth_header(),
-                                             **kwargs)
-            rescue
-              raise "Replace with Invalid Session ID"
-            end
+            return @session.http.request(method, url, params: params,
+                                         headers: @session.get_auth_header(),
+                                         **kwargs)
         end
     
-        def get(url, params={}, **kwargs)
-            return _request("GET", url, params, **kwargs)
+        def get(url, params: {}, **kwargs)
+            return _request("GET", url, params: params, **kwargs)
         end
     
-        def post(url, params={}, **kwargs)
-            return _request("POST", url, params, **kwargs)
+        def post(url, params: {}, **kwargs)
+            return _request("POST", url, params: params, **kwargs)
         end
     
-        def put(url, params={}, **kwargs)
-            return _request("PUT", url, params, **kwargs)
+        def put(url, params: {}, **kwargs)
+            return _request("PUT", url, params: params, **kwargs)
         end
     
-        def delete(url, params={}, **kwargs)
-            return _request("DELETE", url, params, **kwargs)
+        def delete(url, params: {}, **kwargs)
+            return _request("DELETE", url, params: params, **kwargs)
         end
     end
     

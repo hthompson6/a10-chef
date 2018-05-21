@@ -1,4 +1,4 @@
-# Copyright 2018,n  A10 Networks.
+# Copyright 2018,  A10 Networks.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -103,7 +103,7 @@ module ErrorResp
         },
         1023460352 => {
             'DELETE' => {
-                '*' => nil
+                '*' => nil 
             },
             '*' => {
                 '*' => AE::NotFound
