@@ -107,7 +107,7 @@ module A10Client
 
            # (TODO)  Missing logic here. Re-implement later
            r = z.body 
-    
+   
            if r['response'] && r['response']['status'] == 'fail'
                raise "acos exception"
            end
