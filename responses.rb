@@ -103,7 +103,7 @@ module ErrorResp
         },
         1023460352 => {
             'DELETE' => {
-                '*' => nil
+                '*' => nil 
             },
             '*' => {
                 '*' => AE::NotFound
