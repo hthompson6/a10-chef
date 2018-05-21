@@ -108,11 +108,11 @@ module A10Client
            r = z.body 
    
            if r['response'] && r['response']['status'] == 'fail'
-               raise "acos exception"
+               ErrorResp::raise_axapi_ex(r, method, api_url)
            end
     
            if r['authorizationschema']
-               raise "acos exceptions"
+               ErrorResp::raise_axapi_auth_error(r, method, api_url, headers)
            end
     
            return r

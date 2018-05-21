@@ -191,7 +191,7 @@ module ErrorResp
         },
     }
 
-    def self.raise_axapi_error(response, method, api_url, headers)
+    def self.raise_axapi_auth_error(response, method, api_url, headers)
         if response['authorizationschema']
             code = response['authorizationschema']['code']
             s = response['authorzationschema']['error']
