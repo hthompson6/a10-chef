@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-require 'unirest'
+require 'http'
 
 require_relative 'errors'
 require_relative 'responses'
@@ -66,7 +66,7 @@ module A10Client
             else
                 payload = nil
             end
-    
+
             if filename != nil
                # files = {
                     # "file" => ,
@@ -83,40 +83,40 @@ module A10Client
                 else
                     case method
                     when "GET"
-                        z = Unirest.get @url_base + api_url, headers:hdrs,
-                                        parameters:payload.to_json
+                        z = HTTP.headers(hdrs).get(@url_base + api_url,
+                                                   :json => payload)
                     when "POST"
-                        z = Unirest.post @url_base + api_url, headers:hdrs,
-                                         parameters:payload.to_json 
+                        z = HTTP.headers(hdrs).post(@url_base + api_url,
+                                                    :json => payload)
                     when "PUT"
-                        z = Unirest.put @url_base + api_url, headers:hdrs,
-                                        parameters:payload.to_json
+                        z = HTTP.headers(hdrs).put(@url_base + api_ur,
+                                                   :json => payload)
                     when "DELETE"
-                        z = Unirest.delete @url_base + api_url, headers:hdrs,
-                                           parameters:payload.to_json
+                        z = HTTP.headers(hdrs).delete(@url_base + api_url,
+                                                      :json => payload)
                     end
                 end
             rescue SocketError => e
-                raise e
+               raise e
             end
     
-           if z.code == 204
-               return nil
-           end
+            if z.code == 204
+                return nil
+            end
 
-           # (TODO)  Missing logic here. Re-implement later
-           r = z.body 
+            # (TODO)  Missing logic here. Re-implement later
+            r = z.parse 
    
-           if r['response'] && r['response']['status'] == 'fail'
-               ErrorResp::raise_axapi_ex(r, method, api_url)
-           end
+            if r['response'] && r['response']['status'] == 'fail'
+                ErrorResp::raise_axapi_ex(z, method, api_url)
+            end
     
-           if r['authorizationschema']
-               ErrorResp::raise_axapi_auth_error(r, method, api_url, headers)
-           end
+            if r['authorizationschema']
+                ErrorResp::raise_axapi_auth_error(z, method, api_url, headers)
+            end
     
-           return r
-        end
+            return r
+         end
 
         def get(url, params: {}, **kwargs)
             return request("GET", url, params: params, **kwargs)
@@ -155,7 +155,7 @@ module A10Client
 
            begin
                h = {"Authorization" => "A10 #{@session_id}" }
-               r = Unirest.post "/axapi/v3/logoff", headers=h
+               r = HTTP.header(h).post("/axapi/v3/logoff")
            ensure
                @session_id = nil
            end
@@ -199,7 +199,7 @@ module A10Client
             return @session.http.request(method, url, params: params,
                                          headers: @session.get_auth_header(),
                                          **kwargs)
-        rescue AE::InvalidSessionID => e:
+        rescue AE::InvalidSessionID => e
             raise e
         end
     
