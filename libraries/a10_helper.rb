@@ -1,5 +1,5 @@
 require_relative 'axapi_http'
 
 module A10Chef
-    include A10Client
+    extend A10Client
 end
