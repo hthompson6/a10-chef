@@ -106,7 +106,6 @@ module A10Client
 
             # (TODO)  Missing logic here. Re-implement later
             r = z.parse 
-   
             if r['response'] && r['response']['status'] == 'fail'
                 ErrorResp::raise_axapi_ex(z, method, api_url)
             end
